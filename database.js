@@ -9,7 +9,7 @@ function init(mongoString) {
     }
     mongoose.connect(mongoString, function(err) {
         if (err) {
-            console.log(`Error connecting to database: ${error}`)
+            console.log(`Error connecting to database: ${err}`)
         } else {
             console.log('Connected to database.')
         }
