@@ -23,7 +23,13 @@ app.ws('/logging', (ws, req) => {
   ws.on('message', msg => {
     console.log('message received: ' + msg.toString())
     if (msg === 'ping') ws.send('pong')
-    const message = JSON.parse(msg)
+    let message
+    try {
+      message = JSON.parse(msg)
+    } catch (e) {
+      console.log('message received was not valid JSON')
+      return
+    }
     // Check message for auth key
     if (!('authKey' in message && message.authKey === authKey)) {
       console.log('no valid auth in message')
