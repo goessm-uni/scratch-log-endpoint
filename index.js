@@ -12,8 +12,8 @@ verifyEnv()
 
 enableWs(app)
 
-let database = require('./database')
-database.init(process.env.MONGODB);
+//let database = require('./database')
+//database.init(process.env.MONGODB);
 
 app.ws('/logging', (ws, req) => {
   ws.on('open', () => {
@@ -22,6 +22,7 @@ app.ws('/logging', (ws, req) => {
 
   ws.on('message', msg => {
     console.log('message received: ' + msg.toString())
+    if (msg === 'ping') ws.send('pong')
     const message = JSON.parse(msg)
     // Check message for auth key
     if (!('authKey' in message && message.authKey === authKey)) {
@@ -30,7 +31,7 @@ app.ws('/logging', (ws, req) => {
     }
     if ('userActions' in message) {
       const actions = message.userActions
-      database.saveActions(actions)
+      //database.saveActions(actions)
     }
   })
 
