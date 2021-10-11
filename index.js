@@ -7,7 +7,9 @@ const port = process.env.PORT || 8000;
 const app = express();
 const authKey = process.env.LOGGING_AUTH_KEY;
 
-if (!authKey) console.error('no auth key');
+const verifyEnv = require('./verify-env')
+verifyEnv()
+
 enableWs(app)
 
 let database = require('./database')
@@ -44,5 +46,9 @@ app.get('/', (req, res) => {
 const server = app.listen(port, () => {
   console.log(`Data endpoint listening on port ${port}!`)
 });
+
+process.on('exit', code => {
+  console.log(`Process exited with code ${code}`)
+})
 
 module.exports = app
