@@ -3,9 +3,11 @@ const express = require('express')
 const enableWs = require('express-ws')
 require('dotenv').config();
 
-const port = 8000;
+const port = process.env.PORT || 8000;
 const app = express();
 const authKey = process.env.LOGGING_AUTH_KEY;
+
+if (!authKey) console.error('no auth key');
 enableWs(app)
 
 let database = require('./database')

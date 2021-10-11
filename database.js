@@ -3,6 +3,10 @@ const mongoose = require('mongoose')
 
 function init(mongoString) {
     //Set up mongoose connection
+    if (!mongoString) {
+        console.error('missing mongodb string')
+        return
+    }
     mongoose.connect(mongoString, function(err) {
         if (err) {
             console.log(`Error connecting to database: ${error}`)
@@ -32,6 +36,10 @@ function initLogID() {
 
 function saveActions(actions) {
     if (!Array.isArray(actions)) return
+    if (mongoose.connection.readyState !== mongoose.STATES.connected) {
+        console.error('error saving actions: No database connection')
+        return
+    }
     for (const action of actions) {
         // Create documents and save actions
         const action_log_doc = new ActionLog.model(action)
