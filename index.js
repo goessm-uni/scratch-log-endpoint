@@ -1,19 +1,19 @@
-const ws = require('ws')
-const express = require('express')
-const enableWs = require('express-ws')
+const ws = require('ws');
+const express = require('express');
+const enableWs = require('express-ws');
 require('dotenv').config();
 
 const port = process.env.PORT || 8000;
 const app = express();
 const authKey = process.env.LOGGING_AUTH_KEY;
 
-const verifyEnv = require('./verify-env')
-verifyEnv()
+const verifyEnv = require('./verify-env');
+verifyEnv();
 
-enableWs(app)
+enableWs(app);
 
-//let database = require('./database')
-//database.init(process.env.MONGODB);
+let database = require('./database');
+database.init();
 
 app.ws('/logging', (ws, req) => {
   ws.on('open', () => {
@@ -31,7 +31,7 @@ app.ws('/logging', (ws, req) => {
     }
     if ('userActions' in message) {
       const actions = message.userActions
-      //database.saveActions(actions)
+      database.saveActions(actions)
     }
   })
 
@@ -50,6 +50,6 @@ const server = app.listen(port, () => {
 
 process.on('exit', code => {
   console.log(`Process exited with code ${code}`)
-})
+});
 
-module.exports = app
+module.exports = app;

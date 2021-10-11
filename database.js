@@ -1,12 +1,12 @@
-const ActionLog = require('./models/actionlog')
-const mongoose = require('mongoose')
+const ActionLog = require('./models/actionlog');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-function init(mongoString) {
+const mongoString = process.env.MONGODB;
+let unsavedActions = [];
+
+function init() {
     //Set up mongoose connection
-    if (!mongoString) {
-        console.error('missing mongodb string')
-        return
-    }
     mongoose.connect(mongoString, function(err) {
         if (err) {
             console.log(`Error connecting to database: ${err}`)
@@ -17,9 +17,10 @@ function init(mongoString) {
     let db = mongoose.connection;
     db.on('error', console.error.bind(console, 'MongoDB connection error:'));
     initLogID()
-}
+};
 
 function initLogID() {
+    if (!connectionReady()) return
     const query = ActionLog.model.find().sort({logId:-1}).limit(1)
     let max_id_doc = query.exec(function (err, result) {
         if (err) {
@@ -32,14 +33,19 @@ function initLogID() {
             ActionLog.setMaxLogID(result[0].logId)
         }
     })
-}
+};
 
 function saveActions(actions) {
     if (!Array.isArray(actions)) return
-    if (mongoose.connection.readyState !== mongoose.STATES.connected) {
+    if (!connectionReady()) {
         console.error('error saving actions: No database connection')
+        unsavedActions.push(...actions)
+        console.log(`${unsavedActions.length} unsaved actions.`)
+        init()
         return
     }
+    actions.push(...unsavedActions);
+    unsavedActions = [];
     for (const action of actions) {
         // Create documents and save actions
         const action_log_doc = new ActionLog.model(action)
@@ -50,9 +56,13 @@ function saveActions(actions) {
         }
         const doc = ActionLog.model.create(action_log_doc)
     }
+};
+
+function connectionReady() {
+    return mongoose.connection.readyState === mongoose.STATES.connected;
 }
 
 module.exports = {
     init: init,
     saveActions: saveActions
-}
+};

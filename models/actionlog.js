@@ -8,6 +8,7 @@ let maxLogId
 // This only works assuming there is only one data endpoint
 const setMaxLogID = function (max) {
     maxLogId = max
+    console.log(`max log id set to ${maxLogId}`)
 }
 
 const ActionLogSchema = new Schema({
