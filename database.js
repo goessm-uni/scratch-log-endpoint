@@ -33,6 +33,7 @@ function initLogID() {
         } else {
             ActionLog.setMaxLogID(result[0].logId)
         }
+        saveUnsavedActions()
     })
 };
 
@@ -43,15 +44,15 @@ function initLogID() {
  */
 function saveActions(actions) {
     if (!Array.isArray(actions)) return('Invalid actions.')
+
     if (!connectionReady()) {
-        console.error('error saving actions: No database connection')
         unsavedActions.push(...actions)
+        console.error('error saving actions: No database connection')
         console.log(`${unsavedActions.length} unsaved actions.`)
         init()
         return('No database connection')
     }
-    actions.push(...unsavedActions);
-    unsavedActions = [];
+    saveUnsavedActions()
     for (const action of actions) {
         // Create documents and save actions
         const action_log_doc = new ActionLog.model(action)
@@ -63,6 +64,13 @@ function saveActions(actions) {
         const doc = ActionLog.model.create(action_log_doc)
     }
 };
+
+function saveUnsavedActions() {
+    if (!unsavedActions || unsavedActions.length === 0) return
+    let actionsToSave = [...unsavedActions]
+    unsavedActions = []
+    saveActions(actionsToSave)
+}
 
 function connectionReady() {
     return mongoose.connection.readyState === mongoose.STATES.connected;
