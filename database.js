@@ -15,12 +15,13 @@ function init() {
         }
     });
     let db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+    db.on('error', (e) => {
+        console.error(`MongoDB connection error: ${e}`)
+    });
     initLogID()
 };
 
 function initLogID() {
-    if (!connectionReady()) return
     const query = ActionLog.model.find().sort({logId:-1}).limit(1)
     let max_id_doc = query.exec(function (err, result) {
         if (err) {
