@@ -35,14 +35,19 @@ function initLogID() {
     })
 };
 
+/**
+ * Save all actions in given array to database.
+ * @param actions
+ * @returns {string|undefined} Error string or undefined if no error
+ */
 function saveActions(actions) {
-    if (!Array.isArray(actions)) return
+    if (!Array.isArray(actions)) return('Invalid actions.')
     if (!connectionReady()) {
         console.error('error saving actions: No database connection')
         unsavedActions.push(...actions)
         console.log(`${unsavedActions.length} unsaved actions.`)
         init()
-        return
+        return('No database connection')
     }
     actions.push(...unsavedActions);
     unsavedActions = [];

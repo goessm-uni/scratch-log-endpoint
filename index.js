@@ -35,9 +35,16 @@ app.ws('/logging', (ws, req) => {
       console.log('no valid auth in message')
       return
     }
+    // Handle incoming actions
     if ('userActions' in message) {
       const actions = message.userActions
-      database.saveActions(actions)
+      let saveError = database.saveActions(actions)
+      // Send response
+      if (saveError) {
+        ws.send(JSON.stringify({success: false, error: saveError}))
+      } else {
+        ws.send(JSON.stringify({success: true}))
+      }
     }
   })
 
