@@ -21,7 +21,6 @@ const ActionLogSchema = new Schema({
 
 ActionLogSchema.pre('save', function(next) {
     assignLogID(this)
-    console.log(`saving document: ${this}`)
     next()
 })
 

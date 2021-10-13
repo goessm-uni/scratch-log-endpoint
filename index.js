@@ -13,7 +13,7 @@ verifyEnv();
 enableWs(app);
 
 let database = require('./database');
-database.init();
+database.connect();
 
 app.ws('/logging', (ws, req) => {
   ws.on('open', () => {
@@ -39,7 +39,7 @@ app.ws('/logging', (ws, req) => {
     if ('userActions' in message) {
       const actions = message.userActions
       let saveError = database.saveActions(actions)
-      // Send response
+      // Info: Response is sent before error can resolve, so error response will be sent in next message
       if (saveError) {
         ws.send(JSON.stringify({success: false, error: saveError}))
       } else {
