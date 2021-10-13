@@ -15,10 +15,21 @@ enableWs(app);
 let database = require('./database');
 database.connect();
 
-app.ws('/logging', (ws, req) => {
-  ws.on('open', () => {
-    console.log('Websocket connection opened.')
+const pingWebSocket = function (ws) {
+  ws.ping((err, _duration, _payload) => {
+    if (err) {
+      console.log(`Ping error to user ${ws.username}: ${err}`)
+    } else {
+      console.log(`Ping success to user ${ws.username}`)
+    }
   })
+}
+
+app.ws('/logging', (ws, req) => {
+  ws.username = req.query.username
+  console.log(`Websocket opened with user ${ws.username}`)
+  // Send ping to keep websocket alive
+  ws.pingInterval = setInterval(pingWebSocket, 3000, ws)
 
   ws.on('message', msg => {
     console.log('message received: ' + msg.toString())
@@ -49,7 +60,8 @@ app.ws('/logging', (ws, req) => {
   })
 
   ws.on('close', () => {
-    console.log('WebSocket was closed')
+    console.log(`Websocket closed with user ${ws.username}`)
+    clearInterval(ws.pingInterval)
   })
 });
 
