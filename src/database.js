@@ -1,4 +1,4 @@
-const ActionLog = require('./models/actionlog');
+const ActionLog = require('../models/actionlog');
 const mongoose = require('mongoose');
 require('dotenv').config();
 

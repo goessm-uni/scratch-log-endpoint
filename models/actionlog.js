@@ -13,6 +13,7 @@ const setMaxLogID = function (max) {
 
 const ActionLogSchema = new Schema({
     logId: {type: Number},
+    userId: {type: String},
     timestamp: {type: String, required: true},
     type: {type: String, required: true},
     data: {type: Object},
