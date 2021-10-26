@@ -42,7 +42,7 @@ function initLogID() {
             console.log('Error retrieving log ID')
             return
         }
-        if (!result || result.length<1 || result[0].logId == undefined) {
+        if (!result || result.length<1 || !result[0].logId) {
             ActionLog.setMaxLogID(0)
         } else {
             ActionLog.setMaxLogID(result[0].logId)

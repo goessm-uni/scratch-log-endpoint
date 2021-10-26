@@ -1,8 +1,8 @@
 const ws = require('ws');
 const express = require('express');
 const addWebsocket = require('./src/websocket');
-require('./src/util/verify-env').verifyEnv();
 require('dotenv').config();
+require('./src/util/verify-env').verifyEnv();
 
 const port = process.env.PORT || 8000;
 const app = express();

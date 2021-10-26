@@ -15,7 +15,8 @@ const pingWebSocket = function (ws) {
         if (err) {
             console.log(`Ping error to user ${ws.username}: ${err}`)
         } else {
-            console.log(`Ping success to user ${ws.username}`)
+            // console.log(`Ping success to user ${ws.username}`)
+            return
         }
     })
 };
