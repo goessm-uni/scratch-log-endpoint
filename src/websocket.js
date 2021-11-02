@@ -4,6 +4,15 @@ const database = require('./database');
 database.connect();
 require('dotenv').config();
 
+/**
+ * Exports a function that adds a custom logging-websocket to an express app.
+ *
+ * The websocket receives actions from a frontend instrumented with scratch-log-sender.
+ * It saves the actions to a MongoDB database using src/database.
+ * It accepts userIds from the frontend, or generates them if none is specified.
+ * It pings clients occasionally to keep connections alive.
+ */
+
 const path = '/logging';
 const authKey = process.env.LOGGING_AUTH_KEY;
 const pingInterval = 30000;
@@ -21,7 +30,7 @@ const pingWebSocket = function (ws) {
     })
 };
 
-const getUserId = function (wsConnection) {
+const generateUserId = function (wsConnection) {
     if (!wsConnection) return;
     let userId = uuid.v4();
     wsConnection.userId = userId
@@ -63,7 +72,7 @@ const handleMessage = function (msg, ws) {
 
 const onConnection = function (ws, req) {
     if ('userId' in req.query) ws.userId = req.query.userId
-    if (!ws.userId) getUserId(ws)
+    if (!ws.userId) generateUserId(ws)
     connectionMap.set(ws.userId, ws)
     broadcastUserId(ws)
     console.log(`Websocket opened with user ${ws.userId}`)

@@ -3,33 +3,51 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const mongoString = process.env.MONGODB;
+const retryDelay = 5000;
+
 let unsavedActions = [];
 let connecting = false;
+let reconnectTimer;
+let changeStream;
 
 /**
- * Establish mongoose connection
+ * Establish mongoose connection to database.
+ * Reconnects
  */
 function connect() {
+    clearTimeout(reconnectTimer)
+    reconnectTimer = null
+
     if (connectionReady()) return
     if (connecting) return
-    connecting = true
-    //let connectionTimeout = setTimeout(() => {connecting = false}, 5000)
+    connecting = true;
 
     console.log('Trying to connect to database...')
     mongoose.connect(mongoString, function(err) {
         connecting = false
-        //clearTimeout(connectionTimeout)
         if (err) {
-            console.log(`Error connecting to database: ${err}`)
-            setTimeout(connect, 5000) // Retry
-        } else {
-            console.log('Connected to database.')
-            initLogID()
-            mongoose.connection.on('error', (e) => {
-                console.error(`MongoDB connection error: ${e}`)
-            });
+            console.log(`Error connecting to database: ${err}. Retrying in ${retryDelay}ms`)
+            _reconnect()
+            return
         }
+        console.log('Connected to database.')
+        initLogID()
+        mongoose.connection.on('error', (e) => {
+            console.error(`MongoDB connection error: ${e}`)
+            _reconnect()
+        });
+        // Update max log ID on delete by listening to change stream.
+        // Note that change streams are only available on replica sets and sharded clusters.
+        changeStream = ActionLog.model.watch().on('change', data => {
+            if (data.ns.coll !== 'actionlogs') return
+            if (data.operationType === 'delete') initLogID()
+        })
     });
+};
+
+function _reconnect() {
+    if (reconnectTimer) return
+    reconnectTimer = setTimeout(connect, retryDelay)
 };
 
 /**

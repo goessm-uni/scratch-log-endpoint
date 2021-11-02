@@ -6,6 +6,8 @@ require('./src/util/verify-env').verifyEnv();
 
 const port = process.env.PORT || 8000;
 const app = express();
+
+// Add custom websocket from src/websocket to app
 addWebsocket(app);
 
 app.get('/', (req, res) => {
