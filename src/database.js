@@ -38,7 +38,9 @@ function connect() {
         });
         // Update max log ID on delete by listening to change stream.
         // Note that change streams are only available on replica sets and sharded clusters.
-        changeStream = ActionLog.model.watch().on('change', data => {
+        // https://docs.mongodb.com/manual/changeStreams/
+        changeStream = ActionLog.model.watch()
+        changeStream.on('change', data => {
             if (data.ns.coll !== 'actionlogs') return
             if (data.operationType === 'delete') initLogID()
         })
