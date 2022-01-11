@@ -58,8 +58,11 @@ const handleMessage = function (msg, ws) {
     // Handle incoming actions
     if ('userActions' in message) {
         const actions = message.userActions
-        // Add userId to actions
-        for (const action of actions) action.userId = ws.userId
+        // Get userId and taskId from ws if not in action
+        for (const action of actions) {
+            if (!action.userId) action.userId = ws.userId
+            if (!action.taskId) action.taskId = ws.taskId
+        }
         let saveError = database.saveActions(actions)
         // Info: Response is sent before error can resolve, so error response will be sent in next message
         if (saveError) {
@@ -71,7 +74,8 @@ const handleMessage = function (msg, ws) {
 }
 
 const onConnection = function (ws, req) {
-    if ('userId' in req.query) ws.userId = req.query.userId
+    if ('userId' in req.query) ws.userId = req.query.userId // Set userId
+    if ('taskId' in req.query) ws.taskId = req.query.taskId // Set taskId
     if (!ws.userId) generateUserId(ws)
     connectionMap.set(ws.userId, ws)
     broadcastUserId(ws)
