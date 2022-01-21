@@ -1,6 +1,7 @@
 const ActionLog = require('../models/actionlog');
 const Task = require('../models/task')
 const mongoose = require('mongoose');
+const props = require('./util/props');
 require('dotenv').config();
 
 const mongoString = process.env.MONGODB;
@@ -107,10 +108,12 @@ function saveActions(actions) {
  * @returns {Promise<string|*>} Error text or undefined
  */
 async function saveAction(action) {
-    // Validate task
-    const taskValid = await isValidTask(action.taskId)
-    if (!taskValid) {
-        return `ignoring action with invalid taskId: ${action.taskId}`
+    if (props.ignoreInvalidTasks) {
+        // Validate task
+        const taskValid = await isValidTask(action.taskId)
+        if (!taskValid) {
+            return `ignoring action with invalid taskId: ${action.taskId}`
+        }
     }
     // Create document
     const action_log_doc = new ActionLog.model(action)
