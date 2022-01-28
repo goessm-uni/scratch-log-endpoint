@@ -44,7 +44,7 @@ function connect() {
         // https://docs.mongodb.com/manual/changeStreams/
         changeStream = ActionLog.model.watch()
         changeStream.on('change', data => {
-            if (data.ns.coll !== 'actionlogs') return
+            if (data.ns?.coll !== 'actionlogs') return
             if (data.operationType === 'delete') initLogID()
         });
         changeStream.on('error', e => {
