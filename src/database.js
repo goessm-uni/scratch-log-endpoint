@@ -44,7 +44,7 @@ function connect() {
         // https://docs.mongodb.com/manual/changeStreams/
         changeStream = ActionLog.model.watch()
         changeStream.on('change', data => {
-            if (data.ns.coll !== 'actionlogs') return
+            if (data.ns?.coll !== 'actionlogs') return
             if (data.operationType === 'delete') initLogID()
         });
         changeStream.on('error', e => {
@@ -123,6 +123,8 @@ async function saveAction(action) {
         return error.message
     }
     // Save document
+    console.log(action)
+    console.log(action_log_doc)
     ActionLog.model.create(action_log_doc)
         .then(document => {
             console.log(`Saved document: ${document.get('type')}`)
@@ -173,8 +175,19 @@ function addTask(taskId) {
     });
 };
 
+async function getLatestSb3(userId, taskId) {
+    const query = ActionLog.model
+        .findOne({type: 'greenflag', userId: userId, taskId: taskId}, 'data')
+        .sort({timestamp: -1});
+    const data = await query.exec();
+    console.log('fetched latest sb3:')
+    console.log(data)
+    return data?.sb3;
+}
+
 module.exports = {
     connect: connect,
     connectionReady: connectionReady,
-    saveActions: saveActions
+    saveActions: saveActions,
+    getLatestSb3: getLatestSb3
 };

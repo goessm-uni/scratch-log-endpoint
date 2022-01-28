@@ -71,6 +71,9 @@ const handleMessage = function (msg, ws) {
             ws.send(JSON.stringify({success: true}))
         }
     }
+    if('getLatestSb3' in message) {
+        _sendLatestSb3(ws, message.getLatestSb3.userId, message.getLatestSb3.taskId)
+    }
 }
 
 const onConnection = function (ws, req) {
@@ -89,6 +92,13 @@ const onConnection = function (ws, req) {
         console.log(`Websocket closed with user ${ws.userId}`)
         clearInterval(ws.pingInterval)
         connectionMap.delete(ws.userId)
+    })
+};
+
+const _sendLatestSb3 = function (ws, userId, taskId) {
+    database.getLatestSb3(userId, taskId).then(sb3 => {
+        console.log('sending sb3')
+        console.log(sb3)
     })
 };
 
