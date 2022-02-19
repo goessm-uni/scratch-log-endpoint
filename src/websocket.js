@@ -42,7 +42,7 @@ const broadcastUserId = function (wsConnection) {
 }
 
 const handleMessage = function (msg, ws) {
-    console.log('message received')
+    console.log('message received from ' + ws.userId)
     let message
     try {
         message = JSON.parse(msg)
