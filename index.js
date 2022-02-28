@@ -14,6 +14,9 @@ app.get('/', (req, res) => {
   res.send("I'm a little data endpoint :)")
 });
 
+// actionlog routes
+require('./src/routes/actionlog.routes')(app);
+
 const server = app.listen(port, () => {
   console.log(`Data endpoint listening on port ${port}!`)
 });

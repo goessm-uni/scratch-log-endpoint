@@ -180,8 +180,94 @@ function addTask(taskId) {
     });
 }
 
+function getFirstActionlog(taskId, userId) {
+    return new Promise((resolve, reject) => {
+        const query = {
+            $and: [
+                {userId: userId},
+                {taskId: taskId},
+                {codeState: { $ne: null } }
+            ]
+        }
+        ActionLog.model.findOne(query).sort({ timestamp: 1 }).exec((err, actionlog) => {
+            console.log(`getFirst for user ${userId} returned ${actionlog?.type}`);
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(actionlog);
+        });
+    });
+}
+
+function getLastActionlog(taskId, userId) {
+    return new Promise((resolve, reject) => {
+        const query = {
+            $and: [
+                {userId: userId},
+                {taskId: taskId},
+                {codeState: { $ne: null } }
+            ]
+        }
+        ActionLog.model.findOne(query).sort({ timestamp: -1 }).exec((err, actionlog) => {
+            console.log(`getLast for user ${userId} returned ${actionlog?.type}`);
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(actionlog);
+        });
+    });
+}
+
+function getNextActionlog(taskId, userId, timestamp) {
+    return new Promise((resolve, reject) => {
+        const query = {
+            $and: [
+                {'userId': userId},
+                {'taskId': taskId},
+                {'codeState': { $ne: null } },
+                {'timestamp': { $gt: timestamp }}
+            ]
+        }
+        ActionLog.model.findOne(query).sort({ timestamp: 1 }).exec((err, actionlog) => {
+            console.log(`getNext for user ${userId} returned ${actionlog?.type}`);
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(actionlog);
+        });
+    });
+}
+
+function getPreviousActionlog(taskId, userId, timestamp) {
+    return new Promise((resolve, reject) => {
+        const query = {
+            $and: [
+                {'userId': userId},
+                {'taskId': taskId},
+                {'codeState': { $ne: null } },
+                {'timestamp': { $gt: timestamp }}
+            ]
+        }
+        ActionLog.model.findOne(query).sort({ timestamp: -1 }).exec((err, actionlog) => {
+            console.log(`getPrevious for user ${userId} returned ${actionlog?.type}`);
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(actionlog);
+        });
+    });
+}
+
 module.exports = {
     connect: connect,
     connectionReady: connectionReady,
-    saveActions: saveActions
+    saveActions: saveActions,
+    getFirstActionlog: getFirstActionlog,
+    getLastActionlog: getLastActionlog,
+    getNextActionlog: getNextActionlog,
+    getPreviousActionlog: getPreviousActionlog
 };
