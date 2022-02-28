@@ -1,5 +1,5 @@
-const ActionLog = require('../models/actionlog');
-const Task = require('../models/task')
+const ActionLog = require('./models/actionlog');
+const Task = require('./models/task')
 const mongoose = require('mongoose');
 const props = require('./util/props');
 require('dotenv').config();
