@@ -51,12 +51,12 @@ function connect() {
             console.log('change stream error: ' + e)
         });
     });
-};
+}
 
 function _reconnect() {
     if (reconnectTimer) return
     reconnectTimer = setTimeout(connect, retryDelay)
-};
+}
 
 /**
  * Retrieve current maximum log ID from database
@@ -75,7 +75,7 @@ function initLogID() {
         }
         saveUnsavedActions()
     })
-};
+}
 
 /**
  * Save all actions in given array to database.
@@ -100,7 +100,7 @@ function saveActions(actions) {
             if (error) console.log(error)
         })
     }
-};
+}
 
 /**
  * Save given action to database.
@@ -138,7 +138,7 @@ async function saveAction(action) {
             console.log(`Error saving document: ${error}`)
             unsavedActions.push(action)
         })
-};
+}
 
 /**
  * Save all unsaved actions that failed to save before
@@ -166,7 +166,7 @@ async function isValidTask(taskId) {
     })
     if (taskExists && !taskCache.includes(taskId)) taskCache.push(taskId) // Add valid taskId to cache
     return taskExists
-};
+}
 
 function addTask(taskId) {
     Task.model.init().then(() => {
@@ -178,7 +178,7 @@ function addTask(taskId) {
                 console.log(`Error saving task: ${error}`)
             })
     });
-};
+}
 
 module.exports = {
     connect: connect,
