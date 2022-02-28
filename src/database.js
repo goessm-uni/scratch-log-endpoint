@@ -63,7 +63,7 @@ function _reconnect() {
  */
 function initLogID() {
     const query = ActionLog.model.find().sort({logId: -1}).limit(1)
-    let max_id_doc = query.exec(function (err, result) {
+    query.exec(function (err, result) {
         if (err) {
             console.log('Error retrieving log ID')
             return
@@ -120,7 +120,14 @@ async function saveAction(action) {
     // Validate document
     const error = action_log_doc.validateSync();
     if (error) {
-        return error.message
+        let errMsg = 'Validation error'
+        for (const field in error.errors) {
+            const validatorError = error.errors[field]
+            if (validatorError instanceof mongoose.Error.ValidatorError) {
+                errMsg += `: ${validatorError.path}: ${validatorError.kind}`
+            }
+        }
+        return errMsg
     }
     // Save document
     ActionLog.model.create(action_log_doc)
