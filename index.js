@@ -1,11 +1,13 @@
 const ws = require('ws');
 const express = require('express');
 const addWebsocket = require('./src/websocket');
+const cors = require("cors");
 require('dotenv').config();
 require('./src/util/verify-env').verifyEnv();
 
 const port = process.env.PORT || 8000;
 const app = express();
+app.use(cors());
 
 // Add custom websocket from src/websocket to app
 addWebsocket(app);
