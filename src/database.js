@@ -248,7 +248,7 @@ function getPreviousActionlog(taskId, userId, timestamp) {
                 {'userId': userId},
                 {'taskId': taskId},
                 {'codeState': { $ne: null } },
-                {'timestamp': { $gt: timestamp }}
+                {'timestamp': { $lt: timestamp }}
             ]
         }
         ActionLog.model.findOne(query).sort({ timestamp: -1 }).exec((err, actionlog) => {
